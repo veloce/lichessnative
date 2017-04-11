@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-native",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "outDir": "build",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "pretty": true,
+    "rootDir": "src",
+    "target": "es2015",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}
