@@ -12,6 +12,7 @@
     "babel-preset-react-native": "1.9.1",
     "jest": "19.0.2",
     "react-test-renderer": "16.0.0-alpha.6",
+    "shx": "^0.2.2",
     "tslint": "5.0.0",
     "typescript": "2.2.2"
   },
@@ -21,6 +22,7 @@
   "scripts": {
     "start": "react-native start --skipflow",
     "build": "tsc",
+    "prebuild": "shx rm -r build",
     "watch": "npm run build -- --watch",
     "lint": "tslint --project tsconfig.json -e \"**/__mocks__/**\"",
     "test": "jest"

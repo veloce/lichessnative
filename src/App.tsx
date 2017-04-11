@@ -1,29 +1,26 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Dimensions } from 'react-native'
+
+import Board from './common/board/Board'
 
 export default class App extends React.Component<void, void> {
+
   render() {
+    const screenWidth = Dimensions.get('window').width
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+        <Board size={screenWidth} />
       </View>
     )
   }
 }
 
 interface Style {
-  container: React.ViewStyle,
-  welcome: React.TextStyle,
-  instructions: React.TextStyle
+  container: React.ViewStyle
+  welcome: React.TextStyle
 }
 
 const styles = StyleSheet.create<Style>({
@@ -37,10 +34,5 @@ const styles = StyleSheet.create<Style>({
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  }
 })
