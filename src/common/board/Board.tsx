@@ -2,6 +2,7 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import Background from './Background'
+import Piece from './Piece'
 
 interface Props {
   size: number
@@ -17,6 +18,7 @@ export default class Board extends React.Component<Props, void> {
     return (
       <View style={[styles.container, dims]}>
         <Background size={size} darkColor="#83ACBD" lightColor="#F3FAFF" />
+        <Piece size={50} set={"cburnett"} key="e2" role="bishop" color="black" />
       </View>
     )
   }
