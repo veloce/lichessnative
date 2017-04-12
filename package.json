@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@types/react-native": "^0.43.0",
     "react": "16.0.0-alpha.6",
     "react-native": "0.43.2",
     "react-native-svg": "5.1.7"

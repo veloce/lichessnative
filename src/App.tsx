@@ -1,9 +1,24 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-native'
 
 import Board from './common/board/Board'
+import { BoardPiece, BoardPieces, Role, Color } from './common/board/types'
+import * as boardUtil from './common/board/util'
 
-export default class App extends React.Component<void, void> {
+interface State {
+  pieces: BoardPieces
+}
+
+export default class App extends React.Component<void, State> {
+  constructor(props: void) {
+    super(props)
+
+    const pieces = boardUtil.emptyPiecesRecord()
+    pieces['e2'] = makePiece('pawn', 'white')
+    this.state = {
+      pieces
+    }
+  }
 
   render() {
     const screenWidth = Dimensions.get('window').width
@@ -12,15 +27,26 @@ export default class App extends React.Component<void, void> {
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
-        <Board size={screenWidth} />
+        <Board pieces={this.state.pieces} size={screenWidth} />
       </View>
     )
+  }
+
+  componentDidMount() {
+    setTimeout(() => {
+      const newPieces = {
+        ...this.state.pieces,
+        e2: undefined,
+        e4: this.state.pieces.e2
+      }
+      this.setState({ pieces: newPieces })
+    }, 2000)
   }
 }
 
 interface Style {
-  container: React.ViewStyle
-  welcome: React.TextStyle
+  container: ViewStyle
+  welcome: TextStyle
 }
 
 const styles = StyleSheet.create<Style>({
@@ -36,3 +62,15 @@ const styles = StyleSheet.create<Style>({
     margin: 10,
   }
 })
+
+
+const uid = (function() {
+  let id = 0
+  return () => id++
+})()
+
+function makePiece(role: Role, color: Color): BoardPiece {
+  return {
+    role, color, id: uid()
+  }
+}

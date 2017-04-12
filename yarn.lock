@@ -2,6 +2,16 @@
 # yarn lockfile v1
 
 
+"@types/react-native@^0.43.0":
+  version "0.43.0"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.43.0.tgz#eee60406700c0fdf5f178961f085810f06a249e3"
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*":
+  version "15.0.21"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.21.tgz#29d849427237c1463abfb7b370755ee3e5b5b375"
+
 abab@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.3.tgz#b81de5f7274ec4e756d797cd834f303642724e5d"

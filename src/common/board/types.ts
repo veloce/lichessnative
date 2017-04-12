@@ -4,24 +4,25 @@ export type Key = 'a0' | 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' |
 export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type FEN = string
-export type Pos = [number, number]
+export type Coord = [number, number]
 export type PiecesSet = 'cburnett'
 export interface Piece {
   role: Role
   color: Color
   promoted?: boolean
 }
+export interface BoardPiece extends Piece {
+  id: number
+}
+
+export type BoardPieces = Record<Key, BoardPiece | undefined>
+
 export interface Drop {
   role: Role
   key: Key
 }
-export interface Pieces {
-  [key: string]: Piece
-}
 
 export type KeyPair = [Key, Key]
-
-export type NumberPair = [number, number]
 
 export interface Dests {
   [key: string]: Key[]
@@ -45,21 +46,3 @@ export interface MoveMetadata {
 export interface SetPremoveMetadata {
   ctrlKey?: boolean
 }
-
-export interface Memo<A> {
-  (): A
-  clear: () => void
-}
-
-export interface Timer {
-  start: () => void
-  cancel: () => void
-  stop: () => number
-}
-
-export type Unbind = () => void
-export type Timestamp = number
-export type Milliseconds = number
-
-export const files: File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-export const ranks: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8]
