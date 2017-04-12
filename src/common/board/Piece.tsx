@@ -1,20 +1,20 @@
 import React from 'react'
 
-import { Key, Role, Color } from './types'
-import Bishop from './sets/cburnett/Bishop'
+import { Role, Color, PiecesSet } from './types'
+import { piecesSet } from './sets'
 
 interface Props {
   size: number
-  set: string
-  key: Key
+  set: PiecesSet
   role: Role
   color: Color
 }
 
 export default class Piece extends React.PureComponent<Props, void> {
   render() {
+    const ThemedPiece = piecesSet[this.props.set][this.props.role]
     return (
-      <Bishop size={this.props.size} color={this.props.color} />
+      <ThemedPiece size={this.props.size} color={this.props.color} />
     )
   }
 }

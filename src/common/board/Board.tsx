@@ -18,7 +18,14 @@ export default class Board extends React.Component<Props, void> {
     return (
       <View style={[styles.container, dims]}>
         <Background size={size} darkColor="#83ACBD" lightColor="#F3FAFF" />
-        <Piece size={50} set={"cburnett"} key="e2" role="bishop" color="black" />
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <Piece size={50} set="cburnett" role="bishop" color="black" />
+          <Piece size={50} set="cburnett" role="king" color="black" />
+          <Piece size={50} set="cburnett" role="queen" color="black" />
+          <Piece size={50} set="cburnett" role="knight" color="black" />
+          <Piece size={50} set="cburnett" role="rook" color="black" />
+          <Piece size={50} set="cburnett" role="pawn" color="black" />
+        </View>
       </View>
     )
   }
