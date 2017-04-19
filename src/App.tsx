@@ -34,12 +34,13 @@ export default class App extends React.Component<void, State> {
 
   componentDidMount() {
     setTimeout(() => {
-      const newPieces = {
-        ...this.state.pieces,
-        e2: undefined,
-        e4: this.state.pieces.e2
-      }
-      this.setState({ pieces: newPieces })
+      this.setState({
+        pieces: {
+          ...this.state.pieces,
+          e2: undefined,
+          e4: this.state.pieces.e2
+        }
+      })
     }, 2000)
   }
 }
@@ -64,7 +65,7 @@ const styles = StyleSheet.create<Style>({
 })
 
 
-const uid = (function() {
+const uid = (() => {
   let id = 0
   return () => id++
 })()

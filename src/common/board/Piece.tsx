@@ -72,7 +72,10 @@ export default class Piece extends React.PureComponent<Props, State> {
       this.props.pos.y !== newProps.pos.y
     ) {
       this.state.pan.setOffset(newProps.pos)
-      this.state.pan.setValue({ x: this.props.pos.x - newProps.pos.x, y: this.props.pos.y - newProps.pos.y })
+      this.state.pan.setValue({
+        x: this.props.pos.x - newProps.pos.x,
+        y: this.props.pos.y - newProps.pos.y
+      })
       this.moveAnim = Animated.timing(
         this.state.pan,
         { toValue: { x: 0, y: 0 }, duration: 200 }
@@ -96,4 +99,3 @@ const styles = StyleSheet.create<Style>({
     position: 'absolute'
   }
 })
-

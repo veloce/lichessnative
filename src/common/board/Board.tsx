@@ -19,20 +19,20 @@ export default class Board extends React.PureComponent<Props, void> {
       width: size,
       height: size
     }
-    const pieceSize = size / 8
+    const sqSize = size / 8
     return (
       <View style={[styles.container, dims]}>
         <Background size={size} darkColor="#83ACBD" lightColor="#F3FAFF" />
-        {this.renderPieces(pieces, pieceSize)}
+        {this.renderPieces(pieces, sqSize)}
       </View>
     )
   }
 
-  renderPieces(pieces: BoardPieces, pieceSize: number) {
+  renderPieces(pieces: BoardPieces, sqSize: number) {
     return Object.keys(pieces)
     .filter((k: Key) => pieces[k] !== undefined)
     .map((k: Key) =>
-      this.renderPiece(k, pieces[k]!, pieceSize)
+      this.renderPiece(k, pieces[k]!, sqSize)
     )
   }
 
