@@ -13,6 +13,10 @@ interface Props {
 
 export default class Board extends React.PureComponent<Props, void> {
 
+  constructor(props: Props) {
+    super(props)
+  }
+
   render() {
     const { size, pieces } = this.props
     const dims = {
@@ -28,12 +32,26 @@ export default class Board extends React.PureComponent<Props, void> {
     )
   }
 
+  // componentWillReceiveProps(newProps: Props) {
+  //   const np = newProps.pieces, p = this.props.pieces
+  //   let k: Key
+  //   for (k in np) {
+  //     const n = np[k], o = p[k]
+  //     if (n !== undefined && o !== undefined && n !== o && n.color !== o.color) {
+  //       captured[k] = o
+  //     }
+  //   }
+  // }
+
   renderPieces(pieces: BoardPieces, sqSize: number) {
-    return Object.keys(pieces)
-    .filter((k: Key) => pieces[k] !== undefined)
-    .map((k: Key) =>
-      this.renderPiece(k, pieces[k]!, sqSize)
-    )
+    const ks = Object.keys(pieces)
+    const r: JSX.Element[] = []
+    for (let i = 0; i < ks.length; i++) {
+      const k = ks[i] as Key
+      const p = pieces[k]
+      if (p !== undefined) r.push(this.renderPiece(k, p, sqSize))
+    }
+    return r
   }
 
   renderPiece(key: Key, piece: BoardPiece, size: number) {
@@ -42,7 +60,7 @@ export default class Board extends React.PureComponent<Props, void> {
         key={piece.id}
         size={size}
         pos={util.key2Pos(key, size)}
-        set="cburnett"
+        theme="cburnett"
         role={piece.role}
         color={piece.color}
       />

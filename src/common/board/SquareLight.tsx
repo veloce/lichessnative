@@ -10,7 +10,7 @@ interface Props {
   light: 'lastMove' | 'check' | 'selected'
 }
 
-const SquareLight = ({ size, pos, light }: Props) => {
+export function SquareLight({ size, pos, light }: Props) {
   const style = {
     width: size,
     height: size,
@@ -23,7 +23,6 @@ const SquareLight = ({ size, pos, light }: Props) => {
     <View style={[styles.container, style, lightStyle]} />
   )
 }
-export default SquareLight
 
 interface Style {
   container: ViewStyle

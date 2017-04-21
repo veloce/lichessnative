@@ -2,21 +2,24 @@ import React from 'react'
 import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-native'
 
 import Board from './common/board/Board'
-import { BoardPiece, BoardPieces, Role, Color } from './common/board/types'
+import { BoardPieces } from './common/board/types'
 import * as boardUtil from './common/board/util'
+import * as fenUtil from './common/board/fen'
 
 interface State {
   pieces: BoardPieces
 }
 
 export default class App extends React.Component<void, State> {
+  private uidGen: () => number
+
   constructor(props: void) {
     super(props)
 
-    const pieces = boardUtil.emptyPiecesRecord()
-    pieces['e2'] = makePiece('pawn', 'white')
+    this.uidGen = boardUtil.uidGenFactory()
+
     this.state = {
-      pieces
+      pieces: fenUtil.initialBoard(fenUtil.initial, this.uidGen)
     }
   }
 
@@ -63,15 +66,3 @@ const styles = StyleSheet.create<Style>({
     margin: 10,
   }
 })
-
-
-const uid = (() => {
-  let id = 0
-  return () => id++
-})()
-
-function makePiece(role: Role, color: Color): BoardPiece {
-  return {
-    role, color, id: uid()
-  }
-}

@@ -14,13 +14,15 @@ import { piecesSet } from './sets'
 
 interface Props {
   size: number
-  set: PiecesSet
+  theme: PiecesSet
   role: Role
   color: Color
   pos: { x: number, y: number }
+  animate?: boolean
 }
 
 interface State {
+  dragging: boolean
   pan: Animated.ValueXY
 }
 
@@ -32,24 +34,21 @@ export default class Piece extends React.PureComponent<Props, State> {
     super(props)
 
     this.state = {
+      dragging: false,
       pan: new Animated.ValueXY()
     }
     this.state.pan.setOffset(props.pos)
 
     this.panResponder = PanResponder.create({
-       onStartShouldSetPanResponder: () => true,
-       onPanResponderMove: this.handlePanResponderMove,
-       onPanResponderRelease: () => {
-         Animated.spring(
-           this.state.pan,         // Auto-multiplexed
-           {toValue: {x: 0, y: 0}} // Back to zero
-         ).start()
-       },
-     })
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: this.handlePanResponderGrant,
+      onPanResponderMove: this.handlePanResponderMove,
+      onPanResponderRelease: this.handlePanResponderRelease
+    })
   }
 
   render() {
-    const ThemePiece = piecesSet[this.props.set][this.props.role]
+    const ThemePiece = piecesSet[this.props.theme][this.props.role]
     const { size } = this.props
     const style = {
       width: size,
@@ -58,7 +57,7 @@ export default class Piece extends React.PureComponent<Props, State> {
     }
     return (
       <Animated.View
-        style={[styles.container, style]}
+        style={[styles.container, style, this.state.dragging ? { zIndex: 3 } : {}]}
         {...this.panResponder.panHandlers}
       >
         <ThemePiece size={this.props.size} color={this.props.color} />
@@ -67,11 +66,13 @@ export default class Piece extends React.PureComponent<Props, State> {
   }
 
   componentWillReceiveProps(newProps: Props) {
+    this.state.pan.setOffset(newProps.pos)
+
     if (
-      this.props.pos.x !== newProps.pos.x ||
-      this.props.pos.y !== newProps.pos.y
+      this.props.animate === true &&
+      (this.props.pos.x !== newProps.pos.x ||
+      this.props.pos.y !== newProps.pos.y)
     ) {
-      this.state.pan.setOffset(newProps.pos)
       this.state.pan.setValue({
         x: this.props.pos.x - newProps.pos.x,
         y: this.props.pos.y - newProps.pos.y
@@ -84,10 +85,21 @@ export default class Piece extends React.PureComponent<Props, State> {
     }
   }
 
+  private handlePanResponderGrant = () => {
+    this.setState({ dragging: true })
+  }
+
   private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
     this.state.pan.setValue({ x: gestureState.dx, y: gestureState.dy })
   }
 
+  private handlePanResponderRelease = () => {
+    this.setState({ dragging: false })
+    Animated.spring(
+      this.state.pan,
+      {toValue: {x: 0, y: 0}}
+    ).start()
+  }
 }
 
 interface Style {
@@ -96,6 +108,7 @@ interface Style {
 
 const styles = StyleSheet.create<Style>({
   container: {
-    position: 'absolute'
+    position: 'absolute',
+    zIndex: 2
   }
 })

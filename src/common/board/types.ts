@@ -6,19 +6,24 @@ export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type FEN = string
 export type Coord = [number, number]
 export type PiecesSet = 'cburnett'
+
 export interface Piece {
-  role: Role
-  color: Color
+  readonly role: Role
+  readonly color: Color
   promoted?: boolean
 }
+
 export interface BoardPiece extends Piece {
-  id: number
+  readonly id: number
 }
 
+export interface Pieces {
+  [key: string]: Piece
+}
 export type BoardPieces = Record<Key, BoardPiece | undefined>
 
 export interface Drop {
-  role: Role
+  readonly role: Role
   key: Key
 }
 
