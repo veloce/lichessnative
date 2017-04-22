@@ -1,4 +1,4 @@
-import { LayoutRectangle } from 'react-native'
+import { PanResponderGestureState, LayoutRectangle } from 'react-native'
 
 import { EventPos, File, Rank, Key, Coord, BoardPiece, BoardPieces, Piece, Color } from './types'
 
@@ -22,17 +22,16 @@ export function key2Pos(key: Key, squareSize: number): EventPos {
 }
 
 export function getCoordFromEvent(
-  pos: EventPos,
+  gs: PanResponderGestureState,
   boardLayout: LayoutRectangle
 ): Coord | null {
-  const file = Math.ceil(8 * ((pos.x - boardLayout.x) / boardLayout.width))
-  const rank = Math.ceil(8 - (8 * ((pos.y - boardLayout.y) / boardLayout.height)))
+  const file = Math.ceil(8 * ((gs.moveX -  boardLayout.x) / boardLayout.width))
+  const rank = Math.ceil(8 - (8 * ((gs.moveY - boardLayout.y) / boardLayout.height)))
   if (file > 0 && file < 9 && rank > 0 && rank < 9) {
     return [file, rank]
   }
   return null
 }
-
 
 export const allKeys: Key[] =
   Array.prototype.concat(...files.map(c => ranks.map(r => c + r)))
@@ -51,5 +50,5 @@ export function uidGenFactory() {
 }
 
 export function boardPiece(piece: Piece, uidGen: () => number): BoardPiece {
-  return Object.assign(piece, { id: uidGen() })
+  return Object.assign({}, piece, { id: uidGen() })
 }

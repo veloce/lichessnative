@@ -26,7 +26,10 @@ const hiddenShadowPos = { x: 999999, y: 999999 }
 export default class Board extends React.PureComponent<Props, void> {
   private layout: LayoutRectangle
   private panResponder: PanResponderInstance
+  // board key that is currently overflown by a piece during drag
+  // null if out of bounds or no piece currently dragged
   private shadowKey: Key | null
+  // ref to the shadow view element
   private shadow?: View
 
   constructor(props: Props) {
@@ -51,11 +54,10 @@ export default class Board extends React.PureComponent<Props, void> {
       height: size
     }
     const sqSize = size / 8
-    const shadowPos = this.shadowKey !== null ? util.key2Pos(this.shadowKey, sqSize) : hiddenShadowPos
     const shadowStyle = {
       width: sqSize * 2,
       height: sqSize * 2,
-      transform: [{ translate: [shadowPos.x - sqSize / 2, shadowPos.y - sqSize / 2] }]
+      transform: this.getCurrentShadowTransform()
     }
     return (
       <View
@@ -68,39 +70,6 @@ export default class Board extends React.PureComponent<Props, void> {
         {this.renderPieces(pieces, sqSize)}
       </View>
     )
-  }
-
-  private onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
-    this.layout = nativeEvent.layout
-  }
-
-  private handlePanResponderGrant = () => {
-  }
-
-  private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const c = util.getCoordFromEvent({ x: gestureState.moveX, y: gestureState.moveY }, this.layout)
-    const prevKey = this.shadowKey
-    this.shadowKey = c ? util.coord2Key(c) : null
-    if (this.shadow && prevKey !== this.shadowKey) {
-      const sqSize = this.props.size / 8
-      const shadowPos = this.shadowKey !== null ? util.key2Pos(this.shadowKey, sqSize) : hiddenShadowPos
-      this.shadow.setNativeProps({
-        style: {
-          transform: [{ translate: [shadowPos.x - sqSize / 2, shadowPos.y - sqSize / 2] }]
-        }
-      })
-    }
-  }
-
-  private handlePanResponderRelease = () => {
-    this.shadowKey = null
-    if (this.shadow) {
-      this.shadow.setNativeProps({
-        style: {
-          transform: [{ translate: [hiddenShadowPos.x, hiddenShadowPos.y] }]
-        }
-      })
-    }
   }
 
   // componentWillReceiveProps(newProps: Props) {
@@ -136,6 +105,43 @@ export default class Board extends React.PureComponent<Props, void> {
         color={piece.color}
       />
     )
+  }
+
+  private onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
+    this.layout = nativeEvent.layout
+  }
+
+  private handlePanResponderGrant = () => {
+  }
+
+  private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    const c = util.getCoordFromEvent(gestureState, this.layout)
+    const prevKey = this.shadowKey
+    this.shadowKey = c ? util.coord2Key(c) : null
+    if (this.shadow && prevKey !== this.shadowKey) {
+      this.shadow.setNativeProps({
+        style: {
+          transform: this.getCurrentShadowTransform()
+        }
+      })
+    }
+  }
+
+  private handlePanResponderRelease = () => {
+    this.shadowKey = null
+    if (this.shadow) {
+      this.shadow.setNativeProps({
+        style: {
+          transform: [{ translate: [hiddenShadowPos.x, hiddenShadowPos.y] }]
+        }
+      })
+    }
+  }
+
+  private getCurrentShadowTransform() {
+    const sqSize = this.props.size / 8
+    const pos = this.shadowKey !== null ? util.key2Pos(this.shadowKey, sqSize) : hiddenShadowPos
+    return [{ translate: [pos.x - sqSize / 2, pos.y - sqSize / 2] }]
   }
 }
 
