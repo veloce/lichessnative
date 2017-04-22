@@ -1,4 +1,4 @@
-import { Color, Role, PiecesSet } from '../types'
+import { Color, Role, PieceTheme } from '../types'
 
 import Bishop from './cburnett/Bishop'
 import King from './cburnett/King'
@@ -12,9 +12,9 @@ export interface ThemedPieceProps {
   color: Color
 }
 
-type PiecesSetComps = Record<PiecesSet, Record<Role, (props: ThemedPieceProps) => JSX.Element>>
+type PieceThemeComps = Record<PieceTheme, Record<Role, (props: ThemedPieceProps) => JSX.Element>>
 
-export const piecesSet: PiecesSetComps = {
+export const piecesSet: PieceThemeComps = {
   cburnett: {
     king: King,
     queen: Queen,

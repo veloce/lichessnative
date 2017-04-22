@@ -1,4 +1,6 @@
-import { File, Rank, Key, Coord, BoardPiece, BoardPieces, Piece, Color } from './types'
+import { LayoutRectangle } from 'react-native'
+
+import { EventPos, File, Rank, Key, Coord, BoardPiece, BoardPieces, Piece, Color } from './types'
 
 export const files: File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 export const ranks: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -8,13 +10,29 @@ export const colors: Color[] = ['white', 'black']
 export const key2Coord = (k: Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as Coord
 export const coord2Key = (c: Coord) => allKeys[8 * c[0] + c[1] - 9]
 
-export function key2Pos(key: Key, size: number): { x: number, y: number } {
-  const coord = key2Coord(key)
+export function coord2Pos(coord: Coord, squareSize: number): EventPos {
   return {
-    x: (coord[0] - 1) * size,
-    y: (8 - coord[1]) * size
+    x: (coord[0] - 1) * squareSize,
+    y: (8 - coord[1]) * squareSize
   }
 }
+
+export function key2Pos(key: Key, squareSize: number): EventPos {
+  return coord2Pos(key2Coord(key), squareSize)
+}
+
+export function getCoordFromEvent(
+  pos: EventPos,
+  boardLayout: LayoutRectangle
+): Coord | null {
+  const file = Math.ceil(8 * ((pos.x - boardLayout.x) / boardLayout.width))
+  const rank = Math.ceil(8 - (8 * ((pos.y - boardLayout.y) / boardLayout.height)))
+  if (file > 0 && file < 9 && rank > 0 && rank < 9) {
+    return [file, rank]
+  }
+  return null
+}
+
 
 export const allKeys: Key[] =
   Array.prototype.concat(...files.map(c => ranks.map(r => c + r)))

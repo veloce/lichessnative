@@ -4,13 +4,13 @@ import {
   ViewStyle
 } from 'react-native'
 
-interface Props {
-  size: number
-  pos: { x: number, y: number }
+import { BoardItem } from './types'
+
+interface Props extends BoardItem {
   light: 'lastMove' | 'check' | 'selected'
 }
 
-export function SquareLight({ size, pos, light }: Props) {
+export default function SquareLight({ size, pos, light }: Props) {
   const style = {
     width: size,
     height: size,

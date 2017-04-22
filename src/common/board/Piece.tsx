@@ -6,18 +6,16 @@ import {
   PanResponder,
   PanResponderInstance,
   GestureResponderEvent,
-  PanResponderGestureState
+  PanResponderGestureState,
 } from 'react-native'
 
-import { Role, Color, PiecesSet } from './types'
+import { Role, Color, PieceTheme, BoardItem } from './types'
 import { piecesSet } from './sets'
 
-interface Props {
-  size: number
-  theme: PiecesSet
+interface Props extends BoardItem {
+  theme: PieceTheme
   role: Role
   color: Color
-  pos: { x: number, y: number }
   animate?: boolean
 }
 

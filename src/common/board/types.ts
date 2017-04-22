@@ -5,7 +5,13 @@ export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type FEN = string
 export type Coord = [number, number]
-export type PiecesSet = 'cburnett'
+export type EventPos = { x: number, y: number }
+export type PieceTheme = 'cburnett' // | 'merida' etc...
+
+export interface BoardItem {
+  size: number
+  pos: EventPos
+}
 
 export interface Piece {
   readonly role: Role
