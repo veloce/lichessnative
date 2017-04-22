@@ -5,12 +5,12 @@ export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type FEN = string
 export type Coord = [number, number]
-export type EventPos = { x: number, y: number }
+export type NativePos = { x: number, y: number }
 export type PieceTheme = 'cburnett' // | 'merida' etc...
 
 export interface BoardItem {
   size: number
-  pos: EventPos
+  pos: NativePos
 }
 
 export interface Piece {

@@ -34,6 +34,27 @@ export default class App extends React.Component<void, State> {
       </View>
     )
   }
+
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        pieces: {
+          ...this.state.pieces,
+          e2: undefined,
+          e4: this.state.pieces.e2
+        }
+      })
+    }, 500)
+    setTimeout(() => {
+      this.setState({
+        pieces: {
+          ...this.state.pieces,
+          e7: undefined,
+          e5: this.state.pieces.e7
+        }
+      })
+    }, 1000)
+  }
 }
 
 interface Style {

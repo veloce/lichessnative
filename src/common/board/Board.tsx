@@ -32,6 +32,9 @@ export default class Board extends React.PureComponent<Props, void> {
   // ref to the shadow view element
   private shadow?: View
 
+  // ref to the dragging piece
+  private draggingPiece: PieceEl | null
+
   constructor(props: Props) {
     super(props)
 
@@ -49,10 +52,6 @@ export default class Board extends React.PureComponent<Props, void> {
 
   render() {
     const { size, pieces } = this.props
-    const dims = {
-      width: size,
-      height: size
-    }
     const sqSize = size / 8
     const shadowStyle = {
       width: sqSize * 2,
@@ -61,27 +60,23 @@ export default class Board extends React.PureComponent<Props, void> {
     }
     return (
       <View
-        style={[styles.container, dims]}
+        style={[styles.container, { width: size, height: size }]}
         onLayout={this.onLayout}
         {...this.panResponder.panHandlers}
       >
         <Background size={size} darkColor="#83ACBD" lightColor="#F3FAFF" />
-        <View ref={(e: any) => { this.shadow = e }} style={[styles.shadow, shadowStyle]} />
-        {this.renderPieces(pieces, sqSize)}
+        <View
+          ref={(e: any) => { this.shadow = e }}
+          style={[styles.shadow, shadowStyle]}
+        />
+        <View
+          style={[styles.innerContainer, { width: size, height: size }]}
+        >
+          {this.renderPieces(pieces, sqSize)}
+        </View>
       </View>
     )
   }
-
-  // componentWillReceiveProps(newProps: Props) {
-  //   const np = newProps.pieces, p = this.props.pieces
-  //   let k: Key
-  //   for (k in np) {
-  //     const n = np[k], o = p[k]
-  //     if (n !== undefined && o !== undefined && n !== o && n.color !== o.color) {
-  //       captured[k] = o
-  //     }
-  //   }
-  // }
 
   renderPieces(pieces: BoardPieces, sqSize: number) {
     const ks = Object.keys(pieces)
@@ -98,11 +93,14 @@ export default class Board extends React.PureComponent<Props, void> {
     return (
       <PieceEl
         key={piece.id}
+        boardKey={key}
         size={size}
         pos={util.key2Pos(key, size)}
         theme="cburnett"
         role={piece.role}
         color={piece.color}
+        animate={true}
+        ref={key}
       />
     )
   }
@@ -111,17 +109,37 @@ export default class Board extends React.PureComponent<Props, void> {
     this.layout = nativeEvent.layout
   }
 
-  private handlePanResponderGrant = () => {
+  private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
+    const key = util.getKeyFromGrantEvent(gesture, this.layout)
+    if (key !== null && this.props.pieces[key] !== undefined) {
+      const p = this.refs[key]
+      if (p) {
+        this.draggingPiece = p as PieceEl
+        this.draggingPiece.setNativeProps({
+          style: {
+            zIndex: 3
+          }
+        })
+      }
+    }
   }
 
   private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const c = util.getCoordFromEvent(gestureState, this.layout)
     const prevKey = this.shadowKey
-    this.shadowKey = c ? util.coord2Key(c) : null
+    this.shadowKey = util.getKeyFromMoveEvent(gestureState, this.layout)
+    // move shadow
     if (this.shadow && prevKey !== this.shadowKey) {
       this.shadow.setNativeProps({
         style: {
           transform: this.getCurrentShadowTransform()
+        }
+      })
+    }
+    // move piece
+    if (this.draggingPiece !== null) {
+      (this.draggingPiece as PieceEl).setNativeProps({
+        style: {
+          transform: [{ translate: [gestureState.moveX - this.layout.x, gestureState.moveY - this.layout.y] }]
         }
       })
     }
@@ -136,6 +154,18 @@ export default class Board extends React.PureComponent<Props, void> {
         }
       })
     }
+    if (this.draggingPiece !== null) {
+      this.draggingPiece.setNativeProps({
+        style: {
+          zIndex: 2,
+          transform: [{ translate: [
+            this.draggingPiece.props.pos.x,
+            this.draggingPiece.props.pos.y
+          ]}]
+        }
+      })
+      this.draggingPiece = null
+    }
   }
 
   private getCurrentShadowTransform() {
@@ -147,6 +177,7 @@ export default class Board extends React.PureComponent<Props, void> {
 
 interface Style {
   container: ViewStyle
+  innerContainer: ViewStyle
   shadow: ViewStyle
 }
 
@@ -154,6 +185,9 @@ const styles = StyleSheet.create<Style>({
   container: {
     width: 200,
     height: 200,
+  },
+  innerContainer: {
+    position: 'absolute',
   },
   shadow: {
     position: 'absolute',

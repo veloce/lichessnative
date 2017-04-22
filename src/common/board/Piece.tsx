@@ -1,18 +1,16 @@
 import React from 'react'
 import {
+  View,
   StyleSheet,
   ViewStyle,
-  Animated,
-  PanResponder,
-  PanResponderInstance,
-  GestureResponderEvent,
-  PanResponderGestureState,
+  Animated
 } from 'react-native'
 
-import { Role, Color, PieceTheme, BoardItem } from './types'
+import { Key, Role, Color, PieceTheme, BoardItem } from './types'
 import { piecesSet } from './sets'
 
 interface Props extends BoardItem {
+  boardKey: Key
   theme: PieceTheme
   role: Role
   color: Color
@@ -20,29 +18,21 @@ interface Props extends BoardItem {
 }
 
 interface State {
-  dragging: boolean
   pan: Animated.ValueXY
 }
 
 export default class Piece extends React.PureComponent<Props, State> {
-  private panResponder: PanResponderInstance
   private moveAnim: Animated.CompositeAnimation
+
+  public view: View
 
   constructor(props: Props) {
     super(props)
 
     this.state = {
-      dragging: false,
       pan: new Animated.ValueXY()
     }
-    this.state.pan.setOffset(props.pos)
-
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: this.handlePanResponderGrant,
-      onPanResponderMove: this.handlePanResponderMove,
-      onPanResponderRelease: this.handlePanResponderRelease
-    })
+    this.state.pan.setValue(props.pos)
   }
 
   render() {
@@ -55,16 +45,20 @@ export default class Piece extends React.PureComponent<Props, State> {
     }
     return (
       <Animated.View
-        style={[styles.container, style, this.state.dragging ? { zIndex: 3 } : {}]}
-        {...this.panResponder.panHandlers}
+        ref={(e: any) => { this.view = e }}
+        style={[styles.container, style]}
       >
         <ThemePiece size={this.props.size} color={this.props.color} />
       </Animated.View>
     )
   }
 
+  public setNativeProps(np: any) {
+    this.view.setNativeProps(np)
+  }
+
   componentWillReceiveProps(newProps: Props) {
-    this.state.pan.setOffset(newProps.pos)
+    this.state.pan.setValue(newProps.pos)
 
     if (
       this.props.animate === true &&
@@ -72,31 +66,18 @@ export default class Piece extends React.PureComponent<Props, State> {
       this.props.pos.y !== newProps.pos.y)
     ) {
       this.state.pan.setValue({
-        x: this.props.pos.x - newProps.pos.x,
-        y: this.props.pos.y - newProps.pos.y
+        x: this.props.pos.x,
+        y: this.props.pos.y
       })
-      this.moveAnim = Animated.timing(
-        this.state.pan,
-        { toValue: { x: 0, y: 0 }, duration: 200 }
+      this.moveAnim = Animated.timing(this.state.pan,
+        {
+          toValue: { x: newProps.pos.x, y: newProps.pos.y },
+          duration: 200,
+          useNativeDriver: true
+        }
       )
       this.moveAnim.start()
     }
-  }
-
-  private handlePanResponderGrant = () => {
-    this.setState({ dragging: true })
-  }
-
-  private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    this.state.pan.setValue({ x: gestureState.dx, y: gestureState.dy })
-  }
-
-  private handlePanResponderRelease = () => {
-    this.setState({ dragging: false })
-    Animated.spring(
-      this.state.pan,
-      {toValue: {x: 0, y: 0}}
-    ).start()
   }
 }
 
