@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 
 import PieceEl from './Piece'
+import SquareLight from './SquareLight'
 import Background from './Background'
 import * as util from './util'
 import { BoardPiece, BoardPieces, Key } from './types'
@@ -21,9 +22,15 @@ interface Props {
   pieces: BoardPieces
 }
 
+// todo: eventually move this up
+interface State {
+  // selected square
+  selected: Key | null
+}
+
 const hiddenShadowPos = { x: 999999, y: 999999 }
 
-export default class Board extends React.PureComponent<Props, void> {
+export default class Board extends React.PureComponent<Props, State> {
   private layout: LayoutRectangle
   private panResponder: PanResponderInstance
   // board key that is currently overflown by a piece during drag
@@ -38,7 +45,12 @@ export default class Board extends React.PureComponent<Props, void> {
   constructor(props: Props) {
     super(props)
 
+    this.state = {
+      selected: null
+    }
+
     this.shadowKey = null
+    this.draggingPiece = null
 
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -72,6 +84,10 @@ export default class Board extends React.PureComponent<Props, void> {
         <View
           style={[styles.innerContainer, { width: size, height: size }]}
         >
+          {this.state.selected !== null ?
+            <SquareLight light="selected" size={sqSize} pos={util.key2Pos(this.state.selected, sqSize)} /> :
+            null
+          }
           {this.renderPieces(pieces, sqSize)}
         </View>
       </View>
@@ -111,6 +127,9 @@ export default class Board extends React.PureComponent<Props, void> {
 
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
+    if (key !== null) {
+      this.setState({ selected: key })
+    }
     if (key !== null && this.props.pieces[key] !== undefined) {
       const p = this.refs[key]
       if (p) {
@@ -125,21 +144,22 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const prevKey = this.shadowKey
-    this.shadowKey = util.getKeyFromMoveEvent(gestureState, this.layout)
-    // move shadow
-    if (this.shadow && prevKey !== this.shadowKey) {
-      this.shadow.setNativeProps({
-        style: {
-          transform: this.getCurrentShadowTransform()
-        }
-      })
-    }
-    // move piece
-    if (this.draggingPiece !== null) {
+    if (this.draggingPiece) {
+      const prevKey = this.shadowKey
+      this.shadowKey = util.getKeyFromMoveEvent(gestureState, this.layout)
+      if (this.shadow && prevKey !== this.shadowKey) {
+        this.shadow.setNativeProps({
+          style: {
+            transform: this.getCurrentShadowTransform()
+          }
+        })
+      }
       (this.draggingPiece as PieceEl).setNativeProps({
         style: {
-          transform: [{ translate: [gestureState.moveX - this.layout.x, gestureState.moveY - this.layout.y] }]
+          transform: [{ translate: [
+            gestureState.moveX - this.layout.x,
+            gestureState.moveY - this.layout.y
+          ]}]
         }
       })
     }
@@ -154,7 +174,7 @@ export default class Board extends React.PureComponent<Props, void> {
         }
       })
     }
-    if (this.draggingPiece !== null) {
+    if (this.draggingPiece) {
       this.draggingPiece.setNativeProps({
         style: {
           zIndex: 2,
