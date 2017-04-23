@@ -85,7 +85,7 @@ export default class Board extends React.PureComponent<Props, State> {
           style={[styles.innerContainer, { width: size, height: size }]}
         >
           {this.state.selected !== null ?
-            <SquareLight light="selected" size={sqSize} pos={util.key2Pos(this.state.selected, sqSize)} /> :
+            <SquareLight light="selected" size={sqSize} boardKey={this.state.selected} /> :
             null
           }
           {this.renderPieces(pieces, sqSize)}
@@ -111,7 +111,6 @@ export default class Board extends React.PureComponent<Props, State> {
         key={piece.id}
         boardKey={key}
         size={size}
-        pos={util.key2Pos(key, size)}
         theme="cburnett"
         role={piece.role}
         color={piece.color}
@@ -175,13 +174,11 @@ export default class Board extends React.PureComponent<Props, State> {
       })
     }
     if (this.draggingPiece) {
+      const pos = util.key2Pos(this.draggingPiece.props.boardKey, this.props.size / 8)
       this.draggingPiece.setNativeProps({
         style: {
           zIndex: 2,
-          transform: [{ translate: [
-            this.draggingPiece.props.pos.x,
-            this.draggingPiece.props.pos.y
-          ]}]
+          transform: [{ translate: [ pos.x, pos.y ]}]
         }
       })
       this.draggingPiece = null

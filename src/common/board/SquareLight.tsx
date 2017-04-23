@@ -4,13 +4,15 @@ import {
   ViewStyle
 } from 'react-native'
 
-import { BoardItem } from './types'
+import { key2Pos } from './util'
+import { BoardItemProps } from './types'
 
-interface Props extends BoardItem {
+interface Props extends BoardItemProps {
   light: 'lastMove' | 'check' | 'selected'
 }
 
-export default function SquareLight({ size, pos, light }: Props) {
+export default function SquareLight({ size, boardKey, light }: Props) {
+  const pos = key2Pos(boardKey, size)
   const style = {
     width: size,
     height: size,

@@ -8,9 +8,9 @@ export type Coord = [number, number]
 export type NativePos = { x: number, y: number }
 export type PieceTheme = 'cburnett' // | 'merida' etc...
 
-export interface BoardItem {
+export interface BoardItemProps {
   size: number
-  pos: NativePos
+  boardKey: Key
 }
 
 export interface Piece {

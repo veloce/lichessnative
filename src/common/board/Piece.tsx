@@ -6,11 +6,11 @@ import {
   Animated
 } from 'react-native'
 
-import { Key, Role, Color, PieceTheme, BoardItem } from './types'
+import { key2Pos } from './util'
+import { Role, Color, PieceTheme, BoardItemProps } from './types'
 import { piecesSet } from './sets'
 
-interface Props extends BoardItem {
-  boardKey: Key
+interface Props extends BoardItemProps {
   theme: PieceTheme
   role: Role
   color: Color
@@ -32,7 +32,7 @@ export default class Piece extends React.PureComponent<Props, State> {
     this.state = {
       pan: new Animated.ValueXY()
     }
-    this.state.pan.setValue(props.pos)
+    this.state.pan.setValue(key2Pos(props.boardKey, props.size))
   }
 
   render() {
@@ -58,20 +58,19 @@ export default class Piece extends React.PureComponent<Props, State> {
   }
 
   componentWillReceiveProps(newProps: Props) {
-    this.state.pan.setValue(newProps.pos)
+    this.state.pan.setValue(key2Pos(newProps.boardKey, newProps.size))
 
-    if (
-      this.props.animate === true &&
-      (this.props.pos.x !== newProps.pos.x ||
-      this.props.pos.y !== newProps.pos.y)
-    ) {
+    if (this.props.animate && this.props.boardKey !== newProps.boardKey) {
+      const curPos = key2Pos(this.props.boardKey, this.props.size)
+      const newPos = key2Pos(newProps.boardKey, newProps.size)
+
       this.state.pan.setValue({
-        x: this.props.pos.x,
-        y: this.props.pos.y
+        x: curPos.x,
+        y: curPos.y
       })
       this.moveAnim = Animated.timing(this.state.pan,
         {
-          toValue: { x: newProps.pos.x, y: newProps.pos.y },
+          toValue: { x: newPos.x, y: newPos.y },
           duration: 200,
           useNativeDriver: true
         }
