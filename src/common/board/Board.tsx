@@ -143,7 +143,17 @@ export default class Board extends React.PureComponent<Props, State> {
   }
 
   private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    const sqSize = this.props.size / 8
     if (this.draggingPiece) {
+      (this.draggingPiece as PieceEl).setNativeProps({
+        style: {
+          transform: [{ translate: [
+            gestureState.moveX - this.layout.x - (sqSize / 2),
+            gestureState.moveY - this.layout.y - sqSize
+          ]}, {scale: 1.5}]
+        }
+      })
+
       const prevKey = this.shadowKey
       this.shadowKey = util.getKeyFromMoveEvent(gestureState, this.layout)
       if (this.shadow && prevKey !== this.shadowKey) {
@@ -153,14 +163,6 @@ export default class Board extends React.PureComponent<Props, State> {
           }
         })
       }
-      (this.draggingPiece as PieceEl).setNativeProps({
-        style: {
-          transform: [{ translate: [
-            gestureState.moveX - this.layout.x,
-            gestureState.moveY - this.layout.y
-          ]}]
-        }
-      })
     }
   }
 
