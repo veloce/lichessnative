@@ -17,20 +17,20 @@ import Background from './Background'
 import * as util from './util'
 import { BoardPiece, BoardPieces, Key } from './types'
 
+interface BoardActions {
+  selectSquare: (k: Key | null) => void
+}
+
 interface Props {
   size: number
   pieces: BoardPieces
-}
-
-// todo: eventually move this up
-interface State {
-  // selected square
   selected: Key | null
+  actions: BoardActions
 }
 
 const hiddenShadowPos = { x: 999999, y: 999999 }
 
-export default class Board extends React.PureComponent<Props, State> {
+export default class Board extends React.PureComponent<Props, void> {
   private layout: LayoutRectangle
   private panResponder: PanResponderInstance
   // board key that is currently overflown by a piece during drag
@@ -44,10 +44,6 @@ export default class Board extends React.PureComponent<Props, State> {
 
   constructor(props: Props) {
     super(props)
-
-    this.state = {
-      selected: null
-    }
 
     this.shadowKey = null
     this.draggingPiece = null
@@ -63,7 +59,7 @@ export default class Board extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { size, pieces } = this.props
+    const { size, pieces, selected } = this.props
     const sqSize = size / 8
     const shadowStyle = {
       width: sqSize * 2,
@@ -81,13 +77,13 @@ export default class Board extends React.PureComponent<Props, State> {
           ref={(e: any) => { this.shadow = e }}
           style={[styles.shadow, shadowStyle]}
         />
+        { selected !== null ?
+          <SquareLight light="selected" size={sqSize} boardKey={selected} /> :
+          null
+        }
         <View
           style={[styles.innerContainer, { width: size, height: size }]}
         >
-          {this.state.selected !== null ?
-            <SquareLight light="selected" size={sqSize} boardKey={this.state.selected} /> :
-            null
-          }
           {this.renderPieces(pieces, sqSize)}
         </View>
       </View>
@@ -127,7 +123,8 @@ export default class Board extends React.PureComponent<Props, State> {
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
     if (key !== null) {
-      this.setState({ selected: key })
+      if (key !== this.props.selected) this.props.actions.selectSquare(key)
+      else this.props.actions.selectSquare(null)
     }
     if (key !== null && this.props.pieces[key] !== undefined) {
       const p = this.refs[key]

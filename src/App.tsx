@@ -2,12 +2,13 @@ import React from 'react'
 import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-native'
 
 import Board from './common/board/Board'
-import { BoardPieces } from './common/board/types'
+import { BoardPieces, Key } from './common/board/types'
 import * as boardUtil from './common/board/util'
 import * as fenUtil from './common/board/fen'
 
 interface State {
   pieces: BoardPieces
+  selected: Key | null
 }
 
 export default class App extends React.Component<void, State> {
@@ -19,7 +20,8 @@ export default class App extends React.Component<void, State> {
     this.uidGen = boardUtil.uidGenFactory()
 
     this.state = {
-      pieces: fenUtil.initialBoard(fenUtil.initial, this.uidGen)
+      pieces: fenUtil.initialBoard(fenUtil.initial, this.uidGen),
+      selected: null
     }
   }
 
@@ -30,7 +32,14 @@ export default class App extends React.Component<void, State> {
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
-        <Board pieces={this.state.pieces} size={screenWidth} />
+        <Board
+          pieces={this.state.pieces}
+          selected={this.state.selected}
+          actions={{
+            selectSquare: (k: Key) => this.setState({ selected: k })
+          }}
+          size={screenWidth}
+        />
       </View>
     )
   }
