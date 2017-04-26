@@ -24,7 +24,7 @@ interface State {
 export default class Piece extends React.PureComponent<Props, State> {
   private moveAnim: Animated.CompositeAnimation
 
-  public view: View
+  public view?: View
 
   constructor(props: Props) {
     super(props)
@@ -53,7 +53,7 @@ export default class Piece extends React.PureComponent<Props, State> {
     )
   }
 
-  public setNativeProps(np: any) {
+  public setNativeProps(np: Object) {
     if (this.view) this.view.setNativeProps(np)
   }
 
