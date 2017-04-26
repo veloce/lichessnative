@@ -17,36 +17,45 @@ import Background from './Background'
 import * as util from './util'
 import { BoardPiece, BoardPieces, Key } from './types'
 
-interface BoardActions {
-  selectSquare: (k: Key | null) => void
+export interface BoardHandlers {
+  onSelectSquare: (k: Key | null) => void
+  onMove: (orig: Key, dest: Key, animate?: boolean) => void
 }
 
 interface Props {
   size: number
   pieces: BoardPieces
   selected: Key | null
-  actions: BoardActions
+  handlers: BoardHandlers
+  animate?: boolean
 }
 
 const hiddenShadowPos = { x: 999999, y: 999999 }
+// const MOVE_THRESHOLD = 2
 
 export default class Board extends React.PureComponent<Props, void> {
   private layout: LayoutRectangle
   private panResponder: PanResponderInstance
+
   // board key that is currently overflown by a piece during drag
   // null if out of bounds or no piece currently dragged
-  private shadowKey: Key | null
-  // ref to the shadow view element
-  private shadow?: View
+  private dragOver: Key | null
+
+  // re-select square means de-select so we keep track of the previously
+  // selected square
+  private previouslySelected: Key | null
 
   // ref to the dragging piece
   private draggingPiece: PieceEl | null
+  // ref to the shadow view element
+  private shadow?: View
 
   constructor(props: Props) {
     super(props)
 
-    this.shadowKey = null
+    this.dragOver = null
     this.draggingPiece = null
+    this.previouslySelected = null
 
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -54,7 +63,8 @@ export default class Board extends React.PureComponent<Props, void> {
       onMoveShouldSetPanResponderCapture: () => true,
       onPanResponderGrant: this.handlePanResponderGrant,
       onPanResponderMove: this.handlePanResponderMove,
-      onPanResponderRelease: this.handlePanResponderRelease
+      onPanResponderRelease: this.handlePanResponderRelease,
+      onPanResponderTerminate: this.handlePanResponderTerminate
     })
   }
 
@@ -110,7 +120,7 @@ export default class Board extends React.PureComponent<Props, void> {
         theme="cburnett"
         role={piece.role}
         color={piece.color}
-        animate={true}
+        animate={this.props.animate}
         ref={key}
       />
     )
@@ -123,8 +133,14 @@ export default class Board extends React.PureComponent<Props, void> {
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
     if (key !== null) {
-      if (key !== this.props.selected) this.props.actions.selectSquare(key)
-      else this.props.actions.selectSquare(null)
+      const sel = this.props.selected
+      this.previouslySelected = sel
+      const orig = sel !== null && this.props.pieces[sel]
+      if (orig !== undefined && sel !== null && sel !== key) {
+        this.props.handlers.onMove(sel, key)
+      } else {
+        this.props.handlers.onSelectSquare(key)
+      }
     }
     if (key !== null && this.props.pieces[key] !== undefined) {
       const p = this.refs[key]
@@ -151,9 +167,9 @@ export default class Board extends React.PureComponent<Props, void> {
         }
       })
 
-      const prevKey = this.shadowKey
-      this.shadowKey = util.getKeyFromMoveEvent(gestureState, this.layout)
-      if (this.shadow && prevKey !== this.shadowKey) {
+      const prevKey = this.dragOver
+      this.dragOver = util.getKeyFromMoveEvent(gestureState, this.layout)
+      if (this.shadow && prevKey !== this.dragOver) {
         this.shadow.setNativeProps({
           style: {
             transform: this.getCurrentShadowTransform()
@@ -163,8 +179,35 @@ export default class Board extends React.PureComponent<Props, void> {
     }
   }
 
-  private handlePanResponderRelease = () => {
-    this.shadowKey = null
+  private handlePanResponderRelease = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    const orig = this.props.selected
+    const dest = this.dragOver
+    this.dragOver = null
+    this.removeShadow()
+    if (orig) {
+      // TODO threshold
+      const hasMoved = gestureState.dx !== 0 || gestureState.dy !== 0
+      if (dest === null) {
+        this.cancelDrag()
+      } else if (orig !== dest) {
+        this.props.handlers.onMove(orig, dest, false)
+      } else {
+        this.cancelDrag()
+      }
+      if (this.previouslySelected === orig && !hasMoved) {
+        this.props.handlers.onSelectSquare(null)
+      }
+    } else {
+      this.cancelDrag()
+    }
+  }
+
+  private handlePanResponderTerminate = () => {
+    this.removeShadow()
+    this.cancelDrag()
+  }
+
+  private removeShadow() {
     if (this.shadow) {
       this.shadow.setNativeProps({
         style: {
@@ -172,6 +215,9 @@ export default class Board extends React.PureComponent<Props, void> {
         }
       })
     }
+  }
+
+  private cancelDrag() {
     if (this.draggingPiece) {
       const pos = util.key2Pos(this.draggingPiece.props.boardKey, this.props.size / 8)
       this.draggingPiece.setNativeProps({
@@ -186,7 +232,7 @@ export default class Board extends React.PureComponent<Props, void> {
 
   private getCurrentShadowTransform() {
     const sqSize = this.props.size / 8
-    const pos = this.shadowKey !== null ? util.key2Pos(this.shadowKey, sqSize) : hiddenShadowPos
+    const pos = this.dragOver !== null ? util.key2Pos(this.dragOver, sqSize) : hiddenShadowPos
     return [{ translate: [pos.x - sqSize / 2, pos.y - sqSize / 2] }]
   }
 }

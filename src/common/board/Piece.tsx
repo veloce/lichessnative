@@ -54,13 +54,13 @@ export default class Piece extends React.PureComponent<Props, State> {
   }
 
   public setNativeProps(np: any) {
-    this.view.setNativeProps(np)
+    if (this.view) this.view.setNativeProps(np)
   }
 
   componentWillReceiveProps(newProps: Props) {
     this.state.pan.setValue(key2Pos(newProps.boardKey, newProps.size))
 
-    if (this.props.animate && this.props.boardKey !== newProps.boardKey) {
+    if (newProps.animate && this.props.boardKey !== newProps.boardKey) {
       const curPos = key2Pos(this.props.boardKey, this.props.size)
       const newPos = key2Pos(newProps.boardKey, newProps.size)
 
