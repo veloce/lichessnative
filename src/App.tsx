@@ -2,17 +2,13 @@ import React from 'react'
 import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-native'
 
 import Board, { BoardHandlers } from './common/board/Board'
-import { BoardPieces, Key } from './common/board/types'
+import { Key } from './common/board/types'
+import { BoardState } from './common/board/state'
+import { defaults as boardDefaultConf } from './common/board/config'
 import * as boardUtil from './common/board/util'
 import * as fenUtil from './common/board/fen'
 
-interface State {
-  pieces: BoardPieces
-  selected: Key | null
-  animate: boolean
-}
-
-export default class App extends React.Component<void, State> {
+export default class App extends React.Component<void, BoardState> {
   private uidGen: () => number
 
   private boardHandlers: BoardHandlers
@@ -23,8 +19,12 @@ export default class App extends React.Component<void, State> {
     this.uidGen = boardUtil.uidGenFactory()
 
     this.state = {
+      orientation: 'white',
+      turnColor: 'white',
       pieces: fenUtil.initialBoard(fenUtil.initial, this.uidGen),
       selected: null,
+      moveDests: null,
+      check: null,
       animate: true
     }
 
@@ -42,10 +42,9 @@ export default class App extends React.Component<void, State> {
           Welcome to React Native!
         </Text>
         <Board
-          pieces={this.state.pieces}
-          selected={this.state.selected}
-          animate={this.state.animate}
+          state={this.state}
           handlers={this.boardHandlers}
+          config={boardDefaultConf}
           size={screenWidth}
         />
       </View>

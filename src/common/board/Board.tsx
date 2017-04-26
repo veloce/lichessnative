@@ -16,6 +16,8 @@ import SquareLight from './SquareLight'
 import Background from './Background'
 import * as util from './util'
 import { BoardPiece, BoardPieces, Key } from './types'
+import { BoardConfig } from './config'
+import { BoardState } from './state'
 
 export interface BoardHandlers {
   onSelectSquare: (k: Key | null) => void
@@ -24,10 +26,9 @@ export interface BoardHandlers {
 
 interface Props {
   size: number
-  pieces: BoardPieces
-  selected: Key | null
+  state: BoardState
   handlers: BoardHandlers
-  animate?: boolean
+  config: BoardConfig
 }
 
 const hiddenShadowPos = { x: 999999, y: 999999 }
@@ -69,7 +70,8 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   render() {
-    const { size, pieces, selected } = this.props
+    const { size } = this.props
+    const { pieces, selected } = this.props.state
     const sqSize = size / 8
     const shadowStyle = {
       width: sqSize * 2,
@@ -120,7 +122,7 @@ export default class Board extends React.PureComponent<Props, void> {
         theme="cburnett"
         role={piece.role}
         color={piece.color}
-        animate={this.props.animate}
+        animate={this.props.state.animate}
         ref={key}
       />
     )
@@ -133,16 +135,16 @@ export default class Board extends React.PureComponent<Props, void> {
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
     if (key !== null) {
-      const sel = this.props.selected
+      const sel = this.props.state.selected
       this.previouslySelected = sel
-      const orig = sel !== null && this.props.pieces[sel]
+      const orig = sel !== null && this.props.state.pieces[sel]
       if (orig !== undefined && sel !== null && sel !== key) {
         this.props.handlers.onMove(sel, key)
       } else {
         this.props.handlers.onSelectSquare(key)
       }
     }
-    if (key !== null && this.props.pieces[key] !== undefined) {
+    if (key !== null && this.props.state.pieces[key] !== undefined) {
       const p = this.refs[key]
       if (p) {
         this.draggingPiece = p as PieceEl
@@ -180,7 +182,7 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   private handlePanResponderRelease = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const orig = this.props.selected
+    const orig = this.props.state.selected
     const dest = this.dragOver
     this.dragOver = null
     this.removeShadow()
