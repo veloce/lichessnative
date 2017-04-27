@@ -146,14 +146,7 @@ export default class Board extends React.PureComponent<Props, void> {
     }
     if (key !== null && this.props.state.pieces[key] !== undefined) {
       const p = this.refs[key]
-      if (p) {
-        this.draggingPiece = p as PieceEl
-        this.draggingPiece.setNativeProps({
-          style: {
-            zIndex: 3
-          }
-        })
-      }
+      if (p) this.draggingPiece = p as PieceEl
     }
   }
 
@@ -224,7 +217,6 @@ export default class Board extends React.PureComponent<Props, void> {
       const pos = util.key2Pos(this.draggingPiece.props.boardKey, this.props.size / 8)
       this.draggingPiece.setNativeProps({
         style: {
-          zIndex: 2,
           transform: [{ translate: [ pos.x, pos.y ]}]
         }
       })

@@ -100,7 +100,6 @@ interface Style {
 
 const styles = StyleSheet.create<Style>({
   container: {
-    position: 'absolute',
-    zIndex: 2
+    position: 'absolute'
   }
 })
