@@ -39,7 +39,7 @@ export default class Piece extends React.Component<Props, State> {
   }
 
   render() {
-    console.log('piece render key:', this.props.boardKey)
+    // console.log('piece render key:', this.props.boardKey)
     const ThemePiece = piecesSet[this.props.theme][this.props.role]
     const { size } = this.props
     const style = {
