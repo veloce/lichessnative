@@ -1,3 +1,5 @@
+import omit from 'lodash/omit'
+import shallowEqual from 'fbjs/lib/shallowEqual'
 import React from 'react'
 import {
   View,
@@ -10,6 +12,7 @@ import { key2Pos } from './util'
 import { Role, Color, PieceTheme, BoardItemProps } from './types'
 import { piecesSet } from './sets'
 
+
 interface Props extends BoardItemProps {
   theme: PieceTheme
   role: Role
@@ -21,7 +24,7 @@ interface State {
   pan: Animated.ValueXY
 }
 
-export default class Piece extends React.PureComponent<Props, State> {
+export default class Piece extends React.Component<Props, State> {
   private moveAnim: Animated.CompositeAnimation
 
   public view?: View
@@ -36,6 +39,7 @@ export default class Piece extends React.PureComponent<Props, State> {
   }
 
   render() {
+    console.log('piece render key:', this.props.boardKey)
     const ThemePiece = piecesSet[this.props.theme][this.props.role]
     const { size } = this.props
     const style = {
@@ -55,6 +59,16 @@ export default class Piece extends React.PureComponent<Props, State> {
 
   public setNativeProps(np: Object) {
     if (this.view) this.view.setNativeProps(np)
+  }
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    const eqProps = shallowEqual(omit(this.props, 'animate'), omit(nextProps, 'animate'))
+    const eqState = shallowEqual(this.state, nextState)
+    // if (!eqProps) {
+    //   console.log(eqProps, nextProps, this.props)
+    // }
+
+    return (!eqProps || !eqState)
   }
 
   componentWillReceiveProps(newProps: Props) {
