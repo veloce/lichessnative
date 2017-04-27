@@ -25,7 +25,6 @@ export default class App extends React.Component<void, BoardState> {
       selected: null,
       moveDests: null,
       check: null,
-      animate: true
     }
 
     this.boardHandlers = {
@@ -53,7 +52,7 @@ export default class App extends React.Component<void, BoardState> {
 
   private move = (orig: Key, dest: Key, animate = true) => {
     this.setState({
-      animate,
+      animatePieces: animate ? new Set([dest]) : undefined,
       selected: null,
       pieces: {
         ...this.state.pieces,

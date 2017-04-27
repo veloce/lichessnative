@@ -103,17 +103,27 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   renderPieces(pieces: BoardPieces, sqSize: number) {
+    const anims = this.props.state.animatePieces
+    const dg = this.draggingPiece
     const ks = Object.keys(pieces)
-    const r: JSX.Element[] = []
+    const staticPieces: JSX.Element[] = []
+    const animatedPieces: JSX.Element[] = []
+    const draggingPiece: JSX.Element[] = []
     for (let i = 0; i < ks.length; i++) {
       const k = ks[i] as Key
       const p = pieces[k]
-      if (p !== undefined) r.push(this.renderPiece(k, p, sqSize))
+      if (p !== undefined) {
+        const el = this.renderPiece(k, p, sqSize)
+        if (anims !== undefined && anims.has(k)) animatedPieces.push(el)
+        else if (dg !== null && dg.props.boardKey === k) draggingPiece.push(el)
+        else staticPieces.push(el)
+      }
     }
-    return r
+    return staticPieces.concat(animatedPieces).concat(draggingPiece)
   }
 
   renderPiece(key: Key, piece: BoardPiece, size: number) {
+    const anims = this.props.state.animatePieces
     return (
       <PieceEl
         key={piece.id}
@@ -122,7 +132,7 @@ export default class Board extends React.PureComponent<Props, void> {
         theme="cburnett"
         role={piece.role}
         color={piece.color}
-        animate={this.props.state.animate}
+        animate={anims !== undefined ? anims.has(key) : undefined}
         ref={key}
       />
     )
@@ -146,7 +156,13 @@ export default class Board extends React.PureComponent<Props, void> {
     }
     if (key !== null && this.props.state.pieces[key] !== undefined) {
       const p = this.refs[key]
-      if (p) this.draggingPiece = p as PieceEl
+      // when this.draggingPiece is not null means dragging has started
+      // we force the rerendering to put it at the end of the stack (so it goes
+      // above all other pieces)
+      if (p) {
+        this.draggingPiece = p as PieceEl
+        this.forceUpdate()
+      }
     }
   }
 

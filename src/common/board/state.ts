@@ -9,5 +9,5 @@ export interface BoardState {
   lastMove?: [Key, Key] // squares part of the last move ["c3"; "c4"]
   moveDests: Dests | null // valid moves {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
   premoveDests?: Key[] // premove destinations for the current selection
-  animate?: boolean // animate or not the next board mutation
+  animatePieces?: Set<Key> // pieces to animate during the next board render
 }
