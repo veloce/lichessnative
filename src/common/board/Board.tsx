@@ -119,6 +119,7 @@ export default class Board extends React.PureComponent<Props, void> {
         else staticPieces.push(el)
       }
     }
+    // ensure moving pieces are rendered after static ones to emulate zIndex
     return staticPieces.concat(animatedPieces).concat(draggingPiece)
   }
 
@@ -155,8 +156,7 @@ export default class Board extends React.PureComponent<Props, void> {
         this.previouslySelected = sel
         this.props.handlers.onSelectSquare(key)
         // when this.draggingPiece is not null means dragging has started
-        // we force the rerendering to put it at the end of the stack (so it goes
-        // above all other pieces)
+        // we force update to put it at the end of the rendered stack
         if (p) {
           this.draggingPiece = p as PieceEl
           this.forceUpdate()
@@ -173,7 +173,7 @@ export default class Board extends React.PureComponent<Props, void> {
           transform: [{ translate: [
             gestureState.moveX - this.layout.x - (sqSize / 2),
             gestureState.moveY - this.layout.y - sqSize
-          ]}, {scale: 1.5}]
+          ]}, {scale: 2}]
         }
       })
 
@@ -200,6 +200,12 @@ export default class Board extends React.PureComponent<Props, void> {
       if (dest === null) {
         this.cancelDrag()
       } else if (orig !== dest) {
+        const pos = util.key2Pos(dest, this.props.size / 8)
+        this.draggingPiece.setNativeProps({
+          style: {
+            transform: [{ translate: [ pos.x, pos.y ]}]
+          }
+        })
         this.props.handlers.onMove(orig, dest, false)
       } else {
         this.cancelDrag()
