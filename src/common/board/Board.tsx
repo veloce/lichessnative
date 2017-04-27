@@ -146,22 +146,21 @@ export default class Board extends React.PureComponent<Props, void> {
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
     if (key !== null) {
       const sel = this.props.state.selected
-      this.previouslySelected = sel
       const orig = sel !== null && this.props.state.pieces[sel]
       if (orig !== undefined && sel !== null && sel !== key) {
         this.props.handlers.onMove(sel, key)
-      } else {
-        this.props.handlers.onSelectSquare(key)
       }
-    }
-    if (key !== null && this.props.state.pieces[key] !== undefined) {
-      const p = this.refs[key]
-      // when this.draggingPiece is not null means dragging has started
-      // we force the rerendering to put it at the end of the stack (so it goes
-      // above all other pieces)
-      if (p) {
-        this.draggingPiece = p as PieceEl
-        this.forceUpdate()
+      if (this.props.state.pieces[key] !== undefined) {
+        const p = this.refs[key]
+        this.previouslySelected = sel
+        this.props.handlers.onSelectSquare(key)
+        // when this.draggingPiece is not null means dragging has started
+        // we force the rerendering to put it at the end of the stack (so it goes
+        // above all other pieces)
+        if (p) {
+          this.draggingPiece = p as PieceEl
+          this.forceUpdate()
+        }
       }
     }
   }
@@ -195,7 +194,7 @@ export default class Board extends React.PureComponent<Props, void> {
     const dest = this.dragOver
     this.dragOver = null
     this.removeShadow()
-    if (orig) {
+    if (this.draggingPiece && orig) {
       // TODO threshold
       const hasMoved = gestureState.dx !== 0 || gestureState.dy !== 0
       if (dest === null) {
