@@ -108,19 +108,19 @@ export default class Board extends React.PureComponent<Props, void> {
     const ks = Object.keys(pieces)
     const staticPieces: JSX.Element[] = []
     const animatedPieces: JSX.Element[] = []
-    const draggingPiece: JSX.Element[] = []
+    const interactedPiece: JSX.Element[] = []
     for (let i = 0; i < ks.length; i++) {
       const k = ks[i] as Key
       const p = pieces[k]
       if (p !== undefined) {
         const el = this.renderPiece(k, p, sqSize)
         if (anims !== undefined && anims.has(k)) animatedPieces.push(el)
-        else if (dg !== null && dg.props.boardKey === k) draggingPiece.push(el)
+        else if (dg !== null && dg.props.boardKey === k) interactedPiece.push(el)
         else staticPieces.push(el)
       }
     }
     // ensure moving pieces are rendered after static ones to emulate zIndex
-    return staticPieces.concat(animatedPieces).concat(draggingPiece)
+    return staticPieces.concat(animatedPieces).concat(interactedPiece)
   }
 
   renderPiece(key: Key, piece: BoardPiece, size: number) {
@@ -168,7 +168,7 @@ export default class Board extends React.PureComponent<Props, void> {
   private handlePanResponderMove = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
     const sqSize = this.props.size / 8
     if (this.draggingPiece) {
-      (this.draggingPiece as PieceEl).setNativeProps({
+      this.draggingPiece.setNativeProps({
         style: {
           transform: [{ translate: [
             gestureState.moveX - this.layout.x - (sqSize / 2),
