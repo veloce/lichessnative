@@ -93,11 +93,7 @@ export default class Board extends React.PureComponent<Props, void> {
           <SquareLight light="selected" size={sqSize} boardKey={selected} /> :
           null
         }
-        <View
-          style={[styles.innerContainer, { width: size, height: size }]}
-        >
-          {this.renderPieces(pieces, sqSize)}
-        </View>
+        {this.renderPieces(pieces, sqSize)}
       </View>
     )
   }
@@ -206,7 +202,7 @@ export default class Board extends React.PureComponent<Props, void> {
             transform: [{ translate: [ pos.x, pos.y ]}]
           }
         })
-        this.props.handlers.onMove(orig, dest, false)
+        requestAnimationFrame(() => this.props.handlers.onMove(orig, dest, false))
       } else {
         this.cancelDrag()
       }
