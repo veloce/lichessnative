@@ -32,7 +32,6 @@
     "prebuild": "shx rm -r build",
     "watch": "npm run build -- --watch",
     "lint": "tslint --project tsconfig.json -e \"**/__mocks__/**\"",
-    "pretest": "npm run build && npm run lint",
     "test": "jest"
   }
 }
