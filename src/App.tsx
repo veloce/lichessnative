@@ -58,9 +58,6 @@ export default class App extends React.Component<void, BoardState> {
         ...this.state.pieces,
         [orig]: undefined,
         [dest]: this.state.pieces[orig]
-        // [dest]: boardUtil.boardPiece({
-        //   ...this.state.pieces[orig]
-        // }, this.uidGen)
       }
     })
   }

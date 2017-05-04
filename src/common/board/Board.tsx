@@ -206,7 +206,7 @@ export default class Board extends React.PureComponent<Props, void> {
             transform: [{ translate: [ pos.x, pos.y ]}]
           }
         })
-        this.props.handlers.onMove(orig, dest, false)
+        setTimeout(() => this.props.handlers.onMove(orig, dest, false), 0)
       } else {
         this.cancelDrag()
       }
