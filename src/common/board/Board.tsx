@@ -15,7 +15,7 @@ import PieceEl from './Piece'
 import SquareLight from './SquareLight'
 import Background from './Background'
 import * as util from './util'
-import { BoardPiece, BoardPieces, Key } from './types'
+import { BoardPiece, BoardPieces, Key, Light } from './types'
 import { BoardConfig } from './config'
 import * as stateApi from './state'
 
@@ -71,7 +71,7 @@ export default class Board extends React.PureComponent<Props, void> {
 
   render() {
     const { size } = this.props
-    const { pieces, selected } = this.props.state
+    const { pieces } = this.props.state
     const sqSize = size / 8
     const shadowStyle = {
       width: sqSize * 2,
@@ -89,13 +89,21 @@ export default class Board extends React.PureComponent<Props, void> {
           ref={(e: any) => { this.shadow = e }}
           style={[styles.shadow, shadowStyle]}
         />
-        { selected !== null ?
-          <SquareLight light="selected" size={sqSize} boardKey={selected} /> :
-          null
-        }
+        {this.renderLights(sqSize)}
         {this.renderPieces(pieces, sqSize)}
       </View>
     )
+  }
+
+  renderLights(sqSize: number) {
+    const { config, state } = this.props
+    const lights = stateApi.computeSquareLights(state, config)
+    const els: JSX.Element[] = []
+    lights.forEach((l: Light, k: Key) => {
+      els.push(<SquareLight key={'light'+k} light={l} size={sqSize} boardKey={k} />)
+    })
+
+    return els
   }
 
   renderPieces(pieces: BoardPieces, sqSize: number) {

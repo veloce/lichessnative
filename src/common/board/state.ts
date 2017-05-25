@@ -1,4 +1,4 @@
-import { BoardPieces, Key, Color, Dests } from './types'
+import { BoardPieces, Key, Color, Dests, Light } from './types'
 import { BoardConfig } from './config'
 import premove from './premove'
 
@@ -10,7 +10,7 @@ export interface BoardState {
   selected: Key | null
   lastMove?: [Key, Key] // squares part of the last move ["c3"; "c4"]
   moveDests: Dests | null // valid moves {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
-  premoveDests?: Key[] // premove destinations for the current selection
+  premoveDests?: Set<Key> // premove destinations for the current selection
   animatePieces?: Set<Key> // pieces to animate during the next board render
 }
 
@@ -74,3 +74,23 @@ export function isDraggable(state: BoardState, config: BoardConfig, orig: Key) {
   )
 }
 
+function addSquare(squares: Map<Key, string>, key: Key, klass: Light) {
+  squares.set(key, klass)
+}
+
+export function computeSquareLights(state: BoardState, config: BoardConfig) {
+  const squares = new Map()
+  if (state.lastMove && config.highlight.lastMove) state.lastMove.forEach((k) => {
+    if (k) addSquare(squares, k, 'lastMove')
+  })
+  if (state.check && config.highlight.check) addSquare(squares, state.check, 'check')
+  if (state.selected) {
+    addSquare(squares, state.selected, 'selected')
+    const dests = state.moveDests && state.moveDests.get(state.selected)
+    if (dests) dests.forEach((k) => {
+      if (config.highlight.dests) addSquare(squares, k, 'moveDest' + (state.pieces[k] ? 'Occupied' : '') as Light)
+    })
+  }
+
+  return squares
+}

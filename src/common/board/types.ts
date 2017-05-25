@@ -33,6 +33,8 @@ export interface Drop {
   key: Key
 }
 
+export type Light = 'lastMove' | 'check' | 'selected' | 'moveDest' | 'moveDestOccupied'
+
 export type KeyPair = [Key, Key]
 
 export type Dests = Map<Key, Set<Key>>
