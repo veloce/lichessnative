@@ -150,13 +150,9 @@ export default class Board extends React.PureComponent<Props, void> {
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
     const { state, config } = this.props
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
+    const sel = state.selected
     if (key !== null) {
-      const sel = state.selected
-      const orig = sel !== null && state.pieces[sel]
-      if (orig !== undefined && sel !== null &&
-        stateApi.canMove(state, this.props.config, sel, key)) {
-        this.props.handlers.onMove(sel, key)
-      }
+      // there's a piece under that can move: select square and start drag
       if (state.pieces[key] !== undefined && stateApi.isMovable(state, config, key)) {
         const p = this.refs[key]
         this.previouslySelected = sel
@@ -166,6 +162,16 @@ export default class Board extends React.PureComponent<Props, void> {
         if (p && stateApi.isDraggable(state, config, key)) {
           this.draggingPiece = p as PieceEl
           this.forceUpdate()
+        }
+      }
+      // no piece under that can move
+      // if a square is already selected: unselect square or move
+      else if (sel !== null) {
+        const selPiece = state.pieces[sel]
+        if (selPiece !== undefined && stateApi.canMoveTo(state, config, sel, key)) {
+          this.props.handlers.onMove(sel, key)
+        } else {
+          this.props.handlers.onSelectSquare(null)
         }
       }
     }
@@ -206,7 +212,7 @@ export default class Board extends React.PureComponent<Props, void> {
       const hasMoved = gestureState.dx !== 0 || gestureState.dy !== 0
       if (dest === null) {
         this.cancelDrag()
-      } else if (orig !== dest && stateApi.canMove(state, config, orig, dest)) {
+      } else if (stateApi.canMoveTo(state, config, orig, dest)) {
         const pos = util.key2Pos(dest, this.props.size / 8)
         this.draggingPiece.setNativeProps({
           style: {

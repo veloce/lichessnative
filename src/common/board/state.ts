@@ -23,7 +23,7 @@ export function isMovable(state: BoardState, config: BoardConfig, orig: Key) {
     ))
 }
 
-export function canMove(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
+export function canMoveTo(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
   const origDests = state.moveDests && state.moveDests.get(orig)
   return orig !== dest && isMovable(state, config, orig) && (
     config.movable.free || (origDests && origDests.has(dest))
