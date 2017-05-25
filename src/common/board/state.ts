@@ -1,7 +1,6 @@
 import { BoardPieces, Key, Color, Dests } from './types'
 import { BoardConfig } from './config'
 import premove from './premove'
-import * as util from './util'
 
 export interface BoardState {
   pieces: BoardPieces
@@ -25,9 +24,9 @@ export function isMovable(state: BoardState, config: BoardConfig, orig: Key) {
 }
 
 export function canMove(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
+  const origDests = state.moveDests && state.moveDests.get(orig)
   return orig !== dest && isMovable(state, config, orig) && (
-    config.movable.free ||
-    (state.moveDests !== null && util.containsX(state.moveDests[orig], dest))
+    config.movable.free || (origDests && origDests.has(dest))
   )
 }
 
@@ -50,7 +49,7 @@ export function isPremovable(state: BoardState, config: BoardConfig, orig: Key) 
 export function canPremove(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
   return orig !== dest &&
     isPremovable(state, config, orig) &&
-    util.containsX(premove(state.pieces, orig, config.premovable.castle), dest)
+    premove(state.pieces, orig, config.premovable.castle).has(dest)
 }
 
 export function canPredrop(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {

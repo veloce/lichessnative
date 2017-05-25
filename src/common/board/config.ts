@@ -53,7 +53,7 @@ export const defaults: BoardConfig = {
   },
   movable: {
     free: false,
-    color: 'both'
+    color: 'white'
   },
   premovable: {
     enabled: true,

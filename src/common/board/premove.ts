@@ -36,26 +36,28 @@ const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2)
 }
 
-function king(color: Color, rookFiles: number[], canCastle: boolean): Mobility {
+function king(color: Color, rookFiles: Set<number>, canCastle: boolean): Mobility {
   return (x1, y1, x2, y2)  => (
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
     canCastle && y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
-      (x1 === 5 && (x2 === 3 || x2 === 7)) || util.containsX(rookFiles, x2)
+      (x1 === 5 && (x2 === 3 || x2 === 7)) || rookFiles.has(x2)
     )
   )
 }
 
 function rookFilesOf(pieces: Pieces, color: Color) {
-  return Object.keys(pieces).filter(key => {
+  const keys = Object.keys(pieces).filter(key => {
     const piece = pieces[key]
     return piece && piece.color === color && piece.role === 'rook'
   }).map((key: Key) => util.key2Coord(key)[0])
+
+  return new Set(keys)
 }
 
-export default function premove(pieces: Pieces, key: Key, canCastle: boolean): Key[] {
+export default function premove(pieces: Pieces, key: Key, canCastle: boolean): Set<Key> {
   const piece = pieces[key], pos = util.key2Coord(key)
-  if (piece === undefined) return []
+  if (piece === undefined) return new Set()
 
   let mobility: Mobility
   switch (piece.role) {
@@ -78,7 +80,9 @@ export default function premove(pieces: Pieces, key: Key, canCastle: boolean): K
       mobility = king(piece.color, rookFilesOf(pieces, piece.color), canCastle)
       break
   }
-  return util.allKeys.map(util.key2Coord).filter(pos2 => {
+  const keys = util.allKeys.map(util.key2Coord).filter(pos2 => {
     return (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])
   }).map(util.coord2Key)
+
+  return new Set(keys)
 }

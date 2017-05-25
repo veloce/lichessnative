@@ -35,9 +35,8 @@ export interface Drop {
 
 export type KeyPair = [Key, Key]
 
-export interface Dests {
-  [key: string]: Key[]
-}
+export type Dests = Map<Key, Set<Key>>
+
 export interface MaterialDiff {
   white: { [role: string]: number }
   black: { [role: string]: number }

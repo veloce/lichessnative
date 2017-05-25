@@ -78,10 +78,6 @@ export function uidGenFactory() {
   return () => id++
 }
 
-export function containsX<X>(xs: X[] | undefined, x: X): boolean {
-  return xs ? xs.indexOf(x) !== -1 : false
-}
-
 export function boardPiece(piece: Piece, uidGen: () => number): BoardPiece {
   return Object.assign({}, piece, { id: uidGen() })
 }
