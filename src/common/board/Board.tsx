@@ -202,7 +202,7 @@ export default class Board extends React.PureComponent<Props, void> {
             transform: [{ translate: [ pos.x, pos.y ]}]
           }
         })
-        requestAnimationFrame(() => this.props.handlers.onMove(orig, dest, false))
+        this.props.handlers.onMove(orig, dest, false)
       } else {
         this.cancelDrag()
       }

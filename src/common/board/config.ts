@@ -22,6 +22,9 @@ interface Config {
     enabled: boolean // allow premoves for color that can not move
     castle: boolean // whether to allow king castle premoves
   }>
+  predroppable: Readonly<{
+    enabled: boolean // allow predrops for color that can not move
+  }>
   draggable: Readonly<{
     enabled: boolean // allow moves & premoves to use drag'n drop
     deleteOnDropOff: boolean // delete a piece when it is dropped off the board
@@ -55,6 +58,9 @@ export const defaults: BoardConfig = {
   premovable: {
     enabled: true,
     castle: true
+  },
+  predroppable: {
+    enabled: true
   },
   draggable: {
     enabled: true,

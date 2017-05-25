@@ -1,5 +1,5 @@
 import * as util from './util'
-import { Color, Key, Piece, BoardPieces } from './types'
+import { Color, Key, Pieces } from './types'
 
 type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean
 
@@ -46,17 +46,17 @@ function king(color: Color, rookFiles: number[], canCastle: boolean): Mobility {
   )
 }
 
-function rookFilesOf(pieces: BoardPieces, color: Color) {
-  let piece: Piece
+function rookFilesOf(pieces: Pieces, color: Color) {
   return Object.keys(pieces).filter(key => {
-    piece = pieces[key]
+    const piece = pieces[key]
     return piece && piece.color === color && piece.role === 'rook'
   }).map((key: Key) => util.key2Coord(key)[0])
 }
 
-export default function premove(pieces: BoardPieces, key: Key, canCastle: boolean): Key[] {
-  const piece = pieces[key],
-  pos = util.key2Coord(key)
+export default function premove(pieces: Pieces, key: Key, canCastle: boolean): Key[] {
+  const piece = pieces[key], pos = util.key2Coord(key)
+  if (piece === undefined) return []
+
   let mobility: Mobility
   switch (piece.role) {
     case 'pawn':

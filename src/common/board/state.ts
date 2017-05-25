@@ -50,14 +50,15 @@ export function isPremovable(state: BoardState, config: BoardConfig, orig: Key) 
 export function canPremove(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
   return orig !== dest &&
     isPremovable(state, config, orig) &&
-    util.containsX(premove(state.pieces, orig, state.premovable.castle), dest)
+    util.containsX(premove(state.pieces, orig, config.premovable.castle), dest)
 }
 
 export function canPredrop(state: BoardState, config: BoardConfig, orig: Key, dest: Key) {
   const piece = state.pieces[orig]
+  const pDest = state.pieces[dest]
   return piece && dest &&
-    (!state.pieces[dest] || state.pieces[dest].color !== config.movable.color) &&
-    state.predroppable.enabled &&
+    (pDest === undefined || (pDest.color !== config.movable.color)) &&
+    config.predroppable.enabled &&
     (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&
     config.movable.color === piece.color &&
     state.turnColor !== piece.color

@@ -24,7 +24,7 @@ export interface BoardPiece extends Piece {
 }
 
 export interface Pieces {
-  [key: string]: Piece
+  [key: string]: Piece | undefined
 }
 export type BoardPieces = Record<Key, BoardPiece | undefined>
 
