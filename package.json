@@ -27,7 +27,7 @@
   "scripts": {
     "start": "react-native start --skipflow",
     "build": "tsc",
-    "prebuild": "shx rm -r build",
+    "prebuild": "shx rm -rf build",
     "watch": "npm run build -- --watch",
     "lint": "tslint --project tsconfig.json -e \"**/__mocks__/**\"",
     "test": "jest"
