@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-native'
+import { StyleSheet, View, Dimensions, ViewStyle } from 'react-native'
 
 import Board, { BoardHandlers } from './common/board/Board'
 import { Key } from './common/board/types'
@@ -36,9 +36,6 @@ export default class App extends React.Component<void, BoardState> {
     const screenWidth = Dimensions.get('window').width
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
         <Board
           state={this.state}
           handlers={this.boardHandlers}
@@ -64,8 +61,16 @@ export default class App extends React.Component<void, BoardState> {
   componentDidMount() {
     setTimeout(() => {
       const dests = new Map([
+        ["a2", new Set(["a3", "a4"])],
+        ["b2", new Set(["b3", "b4"])],
+        ["c2", new Set(["c3", "c4"])],
+        ["d2", new Set(["d3", "d4"])],
         ["e2", new Set(["e3", "e4"])],
-        ["b1", new Set(["a3", "c3"])]
+        ["f2", new Set(["f3", "f4"])],
+        ["g2", new Set(["g3", "g4"])],
+        ["h2", new Set(["h3", "h4"])],
+        ["b1", new Set(["a3", "c3"])],
+        ["g1", new Set(["f3", "h3"])]
       ]) as Map<Key, Set<Key>>
       this.setState({
         moveDests: dests
@@ -82,7 +87,6 @@ export default class App extends React.Component<void, BoardState> {
 
 interface Style {
   container: ViewStyle
-  welcome: TextStyle
 }
 
 const styles = StyleSheet.create<Style>({
@@ -90,11 +94,6 @@ const styles = StyleSheet.create<Style>({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    backgroundColor: '#1a1a1a',
   }
 })

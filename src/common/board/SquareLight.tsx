@@ -40,7 +40,7 @@ const styles = StyleSheet.create<Style>({
     position: 'absolute'
   },
   selected: {
-    backgroundColor: 'rgba(20, 85, 30, 0.5)'
+    backgroundColor: 'rgba(216, 85, 0, 0.3)'
   },
   lastMove: {
     backgroundColor: 'rgba(155, 199, 0, 0.41)'
