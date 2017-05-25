@@ -1,4 +1,5 @@
 import { Color } from './types'
+import { uidGenFactory } from './util'
 
 interface Config {
   coordinates: boolean // include coords attributes
@@ -22,6 +23,9 @@ interface Config {
     enabled: boolean // allow premoves for color that can not move
     castle: boolean // whether to allow king castle premoves
   }>
+  predroppable: Readonly<{
+    enabled: boolean // allow predrops for color that can not move
+  }>
   draggable: Readonly<{
     enabled: boolean // allow moves & premoves to use drag'n drop
     deleteOnDropOff: boolean // delete a piece when it is dropped off the board
@@ -32,35 +36,41 @@ interface Config {
   }>
 }
 
-export type BoardConfig = Readonly<Config>
+export type BoardConfig = Readonly<Config & { uidGen: () => number }>
 
-export const defaults: BoardConfig = {
-  coordinates: true,
-  autoCastle: true,
-  viewOnly: false, // don't bind events: the user will never be able to move pieces around
-  animation: {
-    enabled: true,
-    duration: 200
-  },
-  highlight: {
-    lastMove: true,
-    check: true,
-    dests: true,
-    premoveDests: true
-  },
-  movable: {
-    free: false,
-    color: 'both'
-  },
-  premovable: {
-    enabled: true,
-    castle: true
-  },
-  draggable: {
-    enabled: true,
-    deleteOnDropOff: false
-  },
-  selectable: {
-    enabled: true
+export function defaults(): BoardConfig {
+  return {
+    coordinates: true,
+    autoCastle: true,
+    viewOnly: false, // don't bind events: the user will never be able to move pieces around
+    animation: {
+      enabled: true,
+      duration: 200
+    },
+    highlight: {
+      lastMove: true,
+      check: true,
+      dests: true,
+      premoveDests: true
+    },
+    movable: {
+      free: false,
+      color: 'white'
+    },
+    premovable: {
+      enabled: true,
+      castle: true
+    },
+    predroppable: {
+      enabled: true
+    },
+    draggable: {
+      enabled: true,
+      deleteOnDropOff: false
+    },
+    selectable: {
+      enabled: true
+    },
+    uidGen: uidGenFactory()
   }
 }

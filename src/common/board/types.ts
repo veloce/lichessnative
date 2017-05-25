@@ -24,7 +24,7 @@ export interface BoardPiece extends Piece {
 }
 
 export interface Pieces {
-  [key: string]: Piece
+  [key: string]: Piece | undefined
 }
 export type BoardPieces = Record<Key, BoardPiece | undefined>
 
@@ -33,11 +33,12 @@ export interface Drop {
   key: Key
 }
 
+export type Light = 'lastMove' | 'check' | 'selected' | 'moveDest' | 'moveDestOccupied'
+
 export type KeyPair = [Key, Key]
 
-export interface Dests {
-  [key: string]: Key[]
-}
+export type Dests = Map<Key, Set<Key>>
+
 export interface MaterialDiff {
   white: { [role: string]: number }
   black: { [role: string]: number }

@@ -15,9 +15,9 @@ import PieceEl from './Piece'
 import SquareLight from './SquareLight'
 import Background from './Background'
 import * as util from './util'
-import { BoardPiece, BoardPieces, Key } from './types'
+import { BoardPiece, BoardPieces, Key, Light } from './types'
 import { BoardConfig } from './config'
-import { BoardState } from './state'
+import * as stateApi from './state'
 
 export interface BoardHandlers {
   onSelectSquare: (k: Key | null) => void
@@ -26,7 +26,7 @@ export interface BoardHandlers {
 
 interface Props {
   size: number
-  state: BoardState
+  state: stateApi.BoardState
   handlers: BoardHandlers
   config: BoardConfig
 }
@@ -71,7 +71,7 @@ export default class Board extends React.PureComponent<Props, void> {
 
   render() {
     const { size } = this.props
-    const { pieces, selected } = this.props.state
+    const { pieces } = this.props.state
     const sqSize = size / 8
     const shadowStyle = {
       width: sqSize * 2,
@@ -89,17 +89,21 @@ export default class Board extends React.PureComponent<Props, void> {
           ref={(e: any) => { this.shadow = e }}
           style={[styles.shadow, shadowStyle]}
         />
-        { selected !== null ?
-          <SquareLight light="selected" size={sqSize} boardKey={selected} /> :
-          null
-        }
-        <View
-          style={[styles.innerContainer, { width: size, height: size }]}
-        >
-          {this.renderPieces(pieces, sqSize)}
-        </View>
+        {this.renderLights(sqSize)}
+        {this.renderPieces(pieces, sqSize)}
       </View>
     )
+  }
+
+  renderLights(sqSize: number) {
+    const { config, state } = this.props
+    const lights = stateApi.computeSquareLights(state, config)
+    const els: JSX.Element[] = []
+    lights.forEach((l: Light, k: Key) => {
+      els.push(<SquareLight key={'light'+k} light={l} size={sqSize} boardKey={k} />)
+    })
+
+    return els
   }
 
   renderPieces(pieces: BoardPieces, sqSize: number) {
@@ -144,20 +148,22 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   private handlePanResponderGrant = (_: GestureResponderEvent, gesture: PanResponderGestureState) => {
+    const { state, config } = this.props
     const key = util.getKeyFromGrantEvent(gesture, this.layout)
     if (key !== null) {
-      const sel = this.props.state.selected
-      const orig = sel !== null && this.props.state.pieces[sel]
-      if (orig !== undefined && sel !== null && sel !== key) {
+      const sel = state.selected
+      const orig = sel !== null && state.pieces[sel]
+      if (orig !== undefined && sel !== null &&
+        stateApi.canMove(state, this.props.config, sel, key)) {
         this.props.handlers.onMove(sel, key)
       }
-      if (this.props.state.pieces[key] !== undefined) {
+      if (state.pieces[key] !== undefined && stateApi.isMovable(state, config, key)) {
         const p = this.refs[key]
         this.previouslySelected = sel
         this.props.handlers.onSelectSquare(key)
         // when this.draggingPiece is not null means dragging has started
         // we force update to put it at the end of the rendered stack
-        if (p) {
+        if (p && stateApi.isDraggable(state, config, key)) {
           this.draggingPiece = p as PieceEl
           this.forceUpdate()
         }
@@ -190,7 +196,8 @@ export default class Board extends React.PureComponent<Props, void> {
   }
 
   private handlePanResponderRelease = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const orig = this.props.state.selected
+    const { state, config } = this.props
+    const orig = state.selected
     const dest = this.dragOver
     this.dragOver = null
     this.removeShadow()
@@ -199,7 +206,7 @@ export default class Board extends React.PureComponent<Props, void> {
       const hasMoved = gestureState.dx !== 0 || gestureState.dy !== 0
       if (dest === null) {
         this.cancelDrag()
-      } else if (orig !== dest) {
+      } else if (orig !== dest && stateApi.canMove(state, config, orig, dest)) {
         const pos = util.key2Pos(dest, this.props.size / 8)
         this.draggingPiece.setNativeProps({
           style: {

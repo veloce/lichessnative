@@ -4,24 +4,23 @@ import { StyleSheet, Text, View, Dimensions, ViewStyle, TextStyle } from 'react-
 import Board, { BoardHandlers } from './common/board/Board'
 import { Key } from './common/board/types'
 import { BoardState } from './common/board/state'
-import { defaults as boardDefaultConf } from './common/board/config'
-import * as boardUtil from './common/board/util'
+import { defaults as boardDefaultConf, BoardConfig } from './common/board/config'
 import * as fenUtil from './common/board/fen'
 
 export default class App extends React.Component<void, BoardState> {
-  private uidGen: () => number
+  private boardConfig: BoardConfig
 
   private boardHandlers: BoardHandlers
 
   constructor(props: void) {
     super(props)
 
-    this.uidGen = boardUtil.uidGenFactory()
+    this.boardConfig = boardDefaultConf()
 
     this.state = {
       orientation: 'white',
       turnColor: 'white',
-      pieces: fenUtil.initialBoard(fenUtil.initial, this.uidGen),
+      pieces: fenUtil.initialBoard(fenUtil.initial, this.boardConfig.uidGen),
       selected: null,
       moveDests: null,
       check: null,
@@ -43,7 +42,7 @@ export default class App extends React.Component<void, BoardState> {
         <Board
           state={this.state}
           handlers={this.boardHandlers}
-          config={boardDefaultConf}
+          config={this.boardConfig}
           size={screenWidth}
         />
       </View>
@@ -64,11 +63,20 @@ export default class App extends React.Component<void, BoardState> {
 
   componentDidMount() {
     setTimeout(() => {
-      this.move('e2', 'e4')
-    }, 500)
-    setTimeout(() => {
-      this.move('e7', 'e5')
-    }, 1000)
+      const dests = new Map([
+        ["e2", new Set(["e3", "e4"])],
+        ["b1", new Set(["a3", "c3"])]
+      ]) as Map<Key, Set<Key>>
+      this.setState({
+        moveDests: dests
+      })
+    }, 100)
+    // setTimeout(() => {
+    //   this.move('e2', 'e4')
+    // }, 500)
+    // setTimeout(() => {
+    //   this.move('e7', 'e5')
+    // }, 1000)
   }
 }
 

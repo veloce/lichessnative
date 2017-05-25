@@ -7,7 +7,7 @@ export const initial: FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
 
 export function initialBoard(fen: FEN, uidGen: () => number): BoardPieces {
   const pieces = read(fen)
-  const boardPieces = mapValues(pieces, p => boardPiece(p, uidGen))
+  const boardPieces = mapValues(pieces, p => boardPiece(p!, uidGen))
   return Object.assign({}, emptyPiecesRecord, boardPieces)
 }
 
@@ -44,11 +44,10 @@ export function read(fen: FEN): Pieces {
 }
 
 export function write(pieces: Pieces): FEN {
-  let piece: Piece, letter: string
   return invRanks.map(y => ranks.map(x => {
-      piece = pieces[coord2Key([x, y])]
+      const piece = pieces[coord2Key([x, y])]
       if (piece) {
-        letter = letters[piece.role]
+        const letter = letters[piece.role]
         return piece.color === 'white' ? letter.toUpperCase() : letter
       } else return '1'
     }).join('')
