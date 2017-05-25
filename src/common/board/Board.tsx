@@ -84,7 +84,7 @@ export default class Board extends React.PureComponent<Props, void> {
         onLayout={this.onLayout}
         {...this.panResponder.panHandlers}
       >
-        <Background size={size} darkColor="#83ACBD" lightColor="#F3FAFF" />
+        <Background size={size} darkColor="#B58863" lightColor="#F0D9B5" />
         <View
           ref={(e: any) => { this.shadow = e }}
           style={[styles.shadow, shadowStyle]}
@@ -213,7 +213,7 @@ export default class Board extends React.PureComponent<Props, void> {
             transform: [{ translate: [ pos.x, pos.y ]}]
           }
         })
-        setTimeout(() => this.props.handlers.onMove(orig, dest, false), 0)
+        this.props.handlers.onMove(orig, dest, false)
       } else {
         this.cancelDrag()
       }
